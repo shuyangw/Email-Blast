@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import structures.TaskSettings;
 
 import java.io.File;
+import java.util.HashMap;
 
 public class Toolbar {
     private Stage primaryStage;
@@ -32,8 +33,9 @@ public class Toolbar {
         newTaskButton.setOnAction(evt -> {
             this.parent.getTaskList().addToTaskList("Unnamed");
         });
+
+        //Save file mechanism
         MenuItem saveTasks = new MenuItem("Save");
-        //TODO: IMPLEMENT SAVE BUTTON FUNCTIONALITY
         saveTasks.setOnAction(evt -> {
             FileChooser fileChooser = new FileChooser();
             FileChooser.ExtensionFilter ext = new FileChooser.ExtensionFilter(
@@ -44,13 +46,25 @@ public class Toolbar {
             File saveFile = fileChooser.showSaveDialog(primaryStage);
             if(saveFile != null){
                 WriteSettings ws = new WriteSettings();
-                ws.serializeObject(new TaskSettings(parent.getTaskList()),
+                ws.serializeObject(parent.makeSettings(),
                         saveFile.getAbsolutePath());
             }
         });
 
+        //Load file mechanism
         MenuItem loadTasks = new MenuItem("Load");
-        //TODO: IMPLEMENT LOAD BUTTON FUNCTIONALITY
+        loadTasks.setOnAction(evt ->{
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Load");
+            File loadFile = fileChooser.showOpenDialog(primaryStage);
+            if(loadFile != null){
+                WriteSettings ws = new WriteSettings();
+                HashMap<String, TaskSettings> settings
+                        = ws.loadObject(loadFile.getAbsolutePath());
+                parent.recieveSettings(settings);
+            }
+        });
+
         MenuItem exitButton = new MenuItem("Exit");
         exitButton.setOnAction(evt -> {
             //TODO: IMPLEMENT RUNNING WHILE CLOSED MECHANISM

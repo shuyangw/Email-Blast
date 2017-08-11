@@ -8,6 +8,9 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import structures.TaskSettings;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MainGUI {
     private static BorderPane borderPane;
     private Stage primaryStage;
@@ -73,7 +76,8 @@ public class MainGUI {
         deleteTaskButton.setPrefSize(75, 35);
         deleteTaskButton.setOnAction(evt -> {
             if(this.taskSelected && taskList.getSize() != 0){
-                Object selectedTask = taskList.getListView().getSelectionModel().getSelectedItem();
+                Object selectedTask
+                        = taskList.getListView().getSelectionModel().getSelectedItem();
                 taskList.removeFromTaskList(selectedTask.toString());
                 if(taskList.getSize() == 0){
                     this.taskSelected = false;
@@ -91,8 +95,21 @@ public class MainGUI {
         primaryStage.show();
     }
 
-    public void loadSettings(TaskSettings settings){
-        //TODO
+    public HashMap<String, TaskSettings> makeSettings(){
+        //TODO: COMPLETE WHEN ATTRIBUTES OF EACH TASK IS FINISHED
+        HashMap<String, TaskSettings> nameSettingsPairs
+                = new HashMap<String, TaskSettings>();
+        for(String x: this.taskList.getItems()){
+            nameSettingsPairs.put(x, null);
+        }
+        return nameSettingsPairs;
+    }
+
+    //TODO: FINISH
+    public void recieveSettings(HashMap<String, TaskSettings> settings){
+        for(String key: settings.keySet()){
+            System.out.println(key + " " + settings.get(key));
+        }
     }
 
     public VBox getPaneLeft(){

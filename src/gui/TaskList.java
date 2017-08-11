@@ -7,8 +7,6 @@ import javafx.stage.Stage;
 
 import structures.AlphabetComparator;
 
-import java.io.Serializable;
-
 public class TaskList{
 
     private final ListView taskList = new ListView();
@@ -60,6 +58,10 @@ public class TaskList{
 
     public ListView getListView(){
         return this.taskList;
+    }
+
+    public ObservableList<String> getItems(){
+        return this.items;
     }
 
     public int getSize(){

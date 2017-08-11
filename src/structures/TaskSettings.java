@@ -5,10 +5,6 @@ import gui.TaskList;
 import java.io.Serializable;
 
 public class TaskSettings implements Serializable{
-    private static final long serialVersionUID = 123214215121L;
-    private TaskList taskList;
+    private static final long serialVersionUID = 1L;
 
-    public TaskSettings(TaskList taskList){
-        this.taskList = taskList;
-    }
 }
