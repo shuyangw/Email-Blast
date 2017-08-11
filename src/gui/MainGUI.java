@@ -1,9 +1,7 @@
 package gui;
 
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -16,6 +14,7 @@ public class MainGUI {
     private VBox leftBox;
     private HBox botBox;
 
+    private TaskList taskList;
     private boolean taskSelected;
     private Object selectedTask;
 
@@ -25,6 +24,7 @@ public class MainGUI {
         //Setup primary stage
         primaryStage.setTitle("Email Blast");
         primaryStage.setResizable(false);
+        //TODO: REDO LATER WHEN IMPLEMENTING RUNNING WHILE CLOSED MECHANISM
         primaryStage.setOnCloseRequest(e -> System.exit(0));
 
         //Setup border pane and VBox and HBox
@@ -36,20 +36,28 @@ public class MainGUI {
         //Setup toolbar up top
         Toolbar bar = new Toolbar(primaryStage, this);
         topBox.getChildren().addAll(bar.getBar());
+        this.taskSelected = false;
 
         //Setup task list and the new task button underneath
-        final TaskList taskList = new TaskList(primaryStage, this);
+        this.taskList = new TaskList(primaryStage, this);
         taskList.initializeList();
-        taskList.getListView().setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if(!taskSelected){
-                    selectedTask = taskList.getListView().getSelectionModel().getSelectedItem();
-                    taskSelected = true;
+        taskList.getListView().setOnMouseClicked(evt -> {
+            if(!taskSelected){
+                selectedTask = taskList.getListView().getSelectionModel().getSelectedItem();
+                taskSelected = true;
+            }
+            //There's a weird exception here that really bothers me but idk how to fix
+            else{
+                try{
+                    //In this if statement, cursed code
+                    if(taskList.getSize() != 0
+                            && taskList.getListView().getSelectionModel().getSelectedItem().equals(selectedTask)){
+                        taskList.getListView().getSelectionModel().select(null);
+                        taskSelected = false;
+                    }
                 }
-                else if(taskList.getListView().getSelectionModel().getSelectedItem().equals(selectedTask)){
-                    taskList.getListView().getSelectionModel().select(null);
-                    taskSelected = false;
+                catch(Exception e){
+                    e.printStackTrace();
                 }
             }
         });
@@ -57,13 +65,21 @@ public class MainGUI {
         //Setup buttons underneath the list
         Button newTaskButton = new Button("New");
         newTaskButton.setPrefSize(75, 35);
-        /*  TODO:   ADD NEW TASK BUTTON FUNCTIONALITY
-            TODO:   SHOULD BE SIMILAR TO Toolbar.java in makeBar()
-         */
-        Button deleteTaskbutton = new Button("Delete");
-        deleteTaskbutton.setPrefSize(75, 35);
-
-        botBox.getChildren().addAll(newTaskButton, deleteTaskbutton);
+        newTaskButton.setOnAction(evt -> {
+           this.taskList.addToTaskList("Unnamed");
+        });
+        Button deleteTaskButton = new Button("Delete");
+        deleteTaskButton.setPrefSize(75, 35);
+        deleteTaskButton.setOnAction(evt -> {
+            if(this.taskSelected && taskList.getSize() != 0){
+                Object selectedTask = taskList.getListView().getSelectionModel().getSelectedItem();
+                taskList.removeFromTaskList(selectedTask.toString());
+                if(taskList.getSize() == 0){
+                    this.taskSelected = false;
+                }
+            }
+        });
+        botBox.getChildren().addAll(newTaskButton, deleteTaskButton);
 
         //Setup scene and shows the application
         borderPane.setTop(topBox);
@@ -76,5 +92,9 @@ public class MainGUI {
 
     public VBox getPaneLeft(){
         return leftBox;
+    }
+
+    public TaskList getTaskList(){
+        return this.taskList;
     }
 }
