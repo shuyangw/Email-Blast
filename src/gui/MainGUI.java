@@ -6,6 +6,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import structures.TaskSettings;
 
 public class MainGUI {
     private static BorderPane borderPane;
@@ -88,6 +89,10 @@ public class MainGUI {
         Scene scene = new Scene(borderPane, 800, 600);
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    public void loadSettings(TaskSettings settings){
+        //TODO
     }
 
     public VBox getPaneLeft(){

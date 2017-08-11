@@ -7,7 +7,10 @@ import javafx.stage.Stage;
 
 import structures.AlphabetComparator;
 
-public class TaskList {
+import java.io.Serializable;
+
+public class TaskList{
+
     private final ListView taskList = new ListView();
     private ObservableList<String> items;
     private Stage primaryStage;

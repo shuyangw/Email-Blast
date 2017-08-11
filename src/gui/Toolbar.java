@@ -1,9 +1,14 @@
 package gui;
 
+import application.WriteSettings;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import structures.TaskSettings;
+
+import java.io.File;
 
 public class Toolbar {
     private Stage primaryStage;
@@ -29,6 +34,21 @@ public class Toolbar {
         });
         MenuItem saveTasks = new MenuItem("Save");
         //TODO: IMPLEMENT SAVE BUTTON FUNCTIONALITY
+        saveTasks.setOnAction(evt -> {
+            FileChooser fileChooser = new FileChooser();
+            FileChooser.ExtensionFilter ext = new FileChooser.ExtensionFilter(
+                    "DAT file(*.dat)", "*.dat"
+            );
+            fileChooser.getExtensionFilters().add(ext);
+            fileChooser.setTitle("Save");
+            File saveFile = fileChooser.showSaveDialog(primaryStage);
+            if(saveFile != null){
+                WriteSettings ws = new WriteSettings();
+                ws.serializeObject(new TaskSettings(parent.getTaskList()),
+                        saveFile.getAbsolutePath());
+            }
+        });
+
         MenuItem loadTasks = new MenuItem("Load");
         //TODO: IMPLEMENT LOAD BUTTON FUNCTIONALITY
         MenuItem exitButton = new MenuItem("Exit");
