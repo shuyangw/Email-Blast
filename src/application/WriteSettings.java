@@ -6,7 +6,8 @@ import java.io.*;
 import java.util.HashMap;
 
 public class WriteSettings {
-    public void serializeObject(HashMap<String, TaskSettings> tasks, String path) {
+    public void serializeObject(
+            HashMap<String, TaskSettings> tasks, String path) {
         FileOutputStream fileOut = null;
         ObjectOutputStream objOutStream = null;
 
@@ -53,7 +54,8 @@ public class WriteSettings {
             fileIn = new FileInputStream(fileName);
             in = new ObjectInputStream(fileIn);
             obj = (HashMap<String, TaskSettings>) in.readObject();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         } finally {
             if (fileIn == null) {

@@ -61,7 +61,7 @@ public class Toolbar {
                 WriteSettings ws = new WriteSettings();
                 HashMap<String, TaskSettings> settings
                         = ws.loadObject(loadFile.getAbsolutePath());
-                parent.recieveSettings(settings);
+                parent.receiveSettings(settings);
             }
         });
 

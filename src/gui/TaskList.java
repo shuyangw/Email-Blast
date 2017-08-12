@@ -8,7 +8,6 @@ import javafx.stage.Stage;
 import structures.AlphabetComparator;
 
 public class TaskList{
-
     private final ListView taskList = new ListView();
     private ObservableList<String> items;
     private Stage primaryStage;
@@ -23,7 +22,8 @@ public class TaskList{
     public void initializeList(){
         this.taskList.setPrefSize(150, 550);
         this.taskList.setEditable(true);
-        this.items = FXCollections.observableArrayList("DEALOL","CEALOL","BEALOL","AEALOL");
+        this.items = FXCollections.observableArrayList(
+                "DEALOL","CEALOL","BEALOL","AEALOL");
         this.taskList.setItems(items);
         this.mainGUI.getPaneLeft().getChildren().add(taskList);
         this.unnamedCount = 0;
