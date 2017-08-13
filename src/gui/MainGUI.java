@@ -2,21 +2,25 @@ package gui;
 
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+
 import structures.TaskSettings;
 
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class MainGUI {
-    private static BorderPane borderPane;
+    private final int RIGHT_TRANSLATE = 5;
+    private final int VERTICAL_TRANSLATE = 5;
+
     private Stage primaryStage;
     private VBox topBox;
     private VBox leftBox;
@@ -26,9 +30,12 @@ public class MainGUI {
     private TaskList taskList;
     private boolean taskSelected;
     private Object selectedTask;
+    private boolean saved; //If the current config has been saved or not
 
-    private final int RIGHT_TRANSLATE = 5;
-    private final int VERTICAL_TRANSLATE = 5;
+    private TextField nameTextField;
+    private TextField senderTextField;
+    private TextField recipientsTextField;
+    private TextArea contentTextField;
 
     public void start(Stage primaryStage){
         this.primaryStage = primaryStage;
@@ -40,7 +47,7 @@ public class MainGUI {
         primaryStage.setOnCloseRequest(e -> System.exit(0));
 
         //Setup border pane and VBox and HBox
-        this.borderPane = new BorderPane();
+        BorderPane borderPane = new BorderPane();
         this.topBox = new VBox();
         this.leftBox = new VBox();
         this.botBox = new HBox();
@@ -58,6 +65,11 @@ public class MainGUI {
 
         //Setup mid box with Task settings
         this.setupSettings();
+        this.setupInputListeners();
+
+        //Setup final buttons on the bottom right
+        this.setupFinalButtons();
+
 
         //Setup scene and shows the application
         borderPane.setTop(topBox);
@@ -72,9 +84,21 @@ public class MainGUI {
     public HashMap<String, TaskSettings> makeSettings(){
         HashMap<String, TaskSettings> nameSettingsPairs = new HashMap<>();
         for(String x: this.taskList.getItems()){
-            nameSettingsPairs.put(x, null);
+            TaskSettings currentTask = new TaskSettings();
+            currentTask.setName(nameTextField.getText());
+            currentTask.setSender(senderTextField.getText());
+            currentTask.setRecipients(
+                    parseRecipients(recipientsTextField.getText()));
+            currentTask.setContent(contentTextField.getText());
+
+            nameSettingsPairs.put(x, currentTask);
         }
         return nameSettingsPairs;
+    }
+
+    //TODO
+    private TaskSettings makeSettingsFromOne(){
+        return null;
     }
 
     //TODO: COMPLETE WHEN ATTRIBUTES OF EACH TASK IS FINISHED
@@ -105,11 +129,19 @@ public class MainGUI {
             else{
                 try{
                     //In this if statement, cursed code
-                    if(taskList.getSize() != 0
-                            && taskList.getListView().getSelectionModel().getSelectedItem().equals(selectedTask)){
-                        taskList.getListView().getSelectionModel().select(null);
-                        taskSelected = false;
+                    if(taskList.getSize() != 0){
+                        if(taskList.getListView().getSelectionModel().getSelectedItem().equals(selectedTask)){
+                            taskList.getListView().getSelectionModel().select(-1);
+                            taskSelected = false;
+                        }
+                        else{
+                            taskSelected = true;
+                            selectedTask
+                                    = taskList.getListView().getSelectionModel().getSelectedItem();
+
+                        }
                     }
+
                 }
                 catch(Exception e){
                     e.printStackTrace();
@@ -137,43 +169,64 @@ public class MainGUI {
     }
 
     private void setupSettings(){
+        final Text nameDescription = new Text("Name");
+        this.layoutCorrection(nameDescription);
+        GridPane.setConstraints(nameDescription, 0, 0);
+        this.nameTextField = new TextField();
+        this.layoutCorrection(nameTextField);
+        this.nameTextField.setPrefWidth(200);
+        GridPane.setConstraints(nameTextField, 1, 0);
+
         final Text senderBoxDescription = new Text("Sender:");
         this.layoutCorrection(senderBoxDescription);
-        GridPane.setConstraints(senderBoxDescription, 0, 0);
-
-        final TextField senderTextField = new TextField();
+        GridPane.setConstraints(senderBoxDescription, 0, 1);
+        this.senderTextField = new TextField();
+        this.senderTextField.setPrefWidth(200);
         this.layoutCorrection(senderTextField);
-        GridPane.setConstraints(senderTextField, 1, 0);
+        GridPane.setConstraints(senderTextField, 1, 1);
 
         final Text recipientBoxDescription = new Text("Recipients:");
         this.layoutCorrection(recipientBoxDescription);
-        GridPane.setConstraints(recipientBoxDescription, 0, 1);
-
-        final TextField recipientTextField = new TextField();
-        this.layoutCorrection(recipientTextField);
-        GridPane.setConstraints(recipientTextField, 1, 1);
+        GridPane.setConstraints(recipientBoxDescription, 0, 2);
+        this.recipientsTextField = new TextField();
+        this.recipientsTextField.setPrefWidth(200);
+        this.layoutCorrection(recipientsTextField);
+        GridPane.setConstraints(recipientsTextField, 1, 2);
 
         final Text contentDescription = new Text("Content:");
         this.layoutCorrection(contentDescription);
         contentDescription.setTranslateY(-85);
-        GridPane.setConstraints(contentDescription, 0, 2);
-
-        final TextField contentTextField = new TextField();
-        this.layoutCorrection(contentTextField);
+        GridPane.setConstraints(contentDescription, 0, 3);
+        this.contentTextField = new TextArea();
+        this.contentTextField.setPrefWidth(200);
         contentTextField.setPrefHeight(200);
-        GridPane.setConstraints(contentTextField, 1, 2);
-
-
+        this.layoutCorrection(contentTextField);
+        GridPane.setConstraints(contentTextField, 1, 3);
 
         midBox.getChildren().addAll(
-                senderBoxDescription, senderTextField, recipientBoxDescription,
-                recipientTextField, contentDescription, contentTextField
+                nameDescription, nameTextField, senderBoxDescription,
+                senderTextField, recipientBoxDescription, recipientsTextField,
+                contentDescription, contentTextField
         );
     }
 
     private void layoutCorrection(Node element){
         element.setTranslateX(RIGHT_TRANSLATE);
         element.setTranslateY(VERTICAL_TRANSLATE);
+    }
+
+    private void setupFinalButtons(){
+        Button applyButton = new Button("Apply");
+        applyButton.setPrefSize(65, 25);
+        applyButton.setTranslateX(210);
+        applyButton.setOnAction(evt -> this.makeSaved());
+
+        Button clearButton = new Button("Clear");
+        clearButton.setPrefSize(65, 25);
+        clearButton.setTranslateX(220);
+        clearButton.setOnAction(evt -> this.clearFieldsWithWarning());
+
+        botBox.getChildren().addAll(applyButton, clearButton);
     }
 
     public static ArrayList<String> parseRecipients(String input){
@@ -197,7 +250,93 @@ public class MainGUI {
             }
             currentEmail += input.charAt(i);
         }
-
         return recipientList;
+    }
+
+    private boolean areFieldsEmpty(){
+        boolean nameFieldEmpty = nameTextField.getText().isEmpty();
+        boolean senderTextFieldEmpty = senderTextField.getText().isEmpty();
+        boolean recipientsTextFieldEmpty = recipientsTextField.getText().isEmpty();
+        boolean contentTextFieldEmpty = contentTextField.getText().isEmpty();
+
+        return nameFieldEmpty && senderTextFieldEmpty
+                && recipientsTextFieldEmpty && contentTextFieldEmpty;
+    }
+
+    private void clearFieldsWithWarning(){
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle("Warning");
+        alert.setHeaderText("Warning");
+        alert.setContentText("Are you sure you want to clear all inputs?");
+        Optional<ButtonType> result = alert.showAndWait();
+        if(result.isPresent() && result.get() == ButtonType.OK){
+            nameTextField.clear();
+            senderTextField.clear();
+            recipientsTextField.clear();
+            contentTextField.clear();
+        }
+    }
+
+    private void clearFields(){
+        nameTextField.clear();
+        senderTextField.clear();
+        recipientsTextField.clear();
+        contentTextField.clear();
+    }
+
+    private void setupInputListeners(){
+        nameTextField.textProperty().addListener(e -> this.makeUnsaved());
+        senderTextField.textProperty().addListener(e -> this.makeUnsaved());
+        recipientsTextField.textProperty().addListener(e -> this.makeUnsaved());
+        contentTextField.textProperty().addListener(e ->this.makeUnsaved());
+    }
+
+    private void makeUnsaved(){
+        System.out.println("MAKE UNSAVED");
+        if(!taskSelected){
+            return;
+        }
+
+        this.saved = false;
+        String selectedString = this.selectedTask.toString();
+        int index = this.taskList.getItems().indexOf(selectedString);
+        if(index == -1){
+            return;
+        }
+
+        System.out.println("WOWO");
+        if(this.taskList.getItems().get(index).charAt(selectedString.length() - 1) == '*'){
+            return;
+        }
+        System.out.println("WOWOO@");
+        this.taskList.getItems().set(index, selectedString+"*");
+        this.refreshSelectedTask();
+    }
+
+    private void makeSaved(){
+        System.out.println("MAKE SAVED");
+        if(!taskSelected){
+            return;
+        }
+
+        this.saved = true;
+        String selectedString = this.selectedTask.toString();
+        int index = this.taskList.getItems().indexOf(selectedString);
+        if(index == -1){
+            return;
+        }
+        System.out.println("NICE");
+        if(this.taskList.getItems().get(index).charAt(selectedString.length() - 1) != '*'){
+            return;
+        }
+        System.out.println("NICE2");
+        this.taskList.getItems().set(
+                index, selectedString.substring(0, selectedString.length() - 1));
+        this.refreshSelectedTask();
+    }
+
+    private void refreshSelectedTask(){
+        this.selectedTask
+                = taskList.getListView().getSelectionModel().getSelectedItem();
     }
 }

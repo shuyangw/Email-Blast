@@ -23,7 +23,7 @@ public class TaskList{
         this.taskList.setPrefSize(150, 550);
         this.taskList.setEditable(true);
         this.items = FXCollections.observableArrayList(
-                "DEALOL","CEALOL","BEALOL","AEALOL");
+                "Dealol","Cealol","Bealol","Aealol");
         this.taskList.setItems(items);
         this.mainGUI.getPaneLeft().getChildren().add(taskList);
         this.unnamedCount = 0;
