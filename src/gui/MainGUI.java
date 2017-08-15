@@ -4,10 +4,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -30,7 +27,8 @@ public class MainGUI {
     private TaskList taskList;
     private boolean taskSelected;
     private Object selectedTask;
-    private boolean saved; //If the current config has been saved or not
+    private boolean doNot;
+    private HashMap<String, TaskSettings> settingsMap;
 
     private TextField nameTextField;
     private TextField senderTextField;
@@ -67,38 +65,70 @@ public class MainGUI {
         this.setupSettings();
         this.setupInputListeners();
 
+
         //Setup final buttons on the bottom right
         this.setupFinalButtons();
 
+        this.makeUneditable();
+
+        this.settingsMap = this.makeSettings();
 
         //Setup scene and shows the application
         borderPane.setTop(topBox);
         borderPane.setLeft(leftBox);
         borderPane.setBottom(botBox);
         borderPane.setCenter(midBox);
+
         Scene scene = new Scene(borderPane, 500, 600);
+        scene.getStylesheets().add("application/application.css");
+
+
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
     public HashMap<String, TaskSettings> makeSettings(){
+        if(taskList.getItems().isEmpty()){
+            return new HashMap<>();
+        }
+
         HashMap<String, TaskSettings> nameSettingsPairs = new HashMap<>();
         for(String x: this.taskList.getItems()){
             TaskSettings currentTask = new TaskSettings();
             currentTask.setName(nameTextField.getText());
             currentTask.setSender(senderTextField.getText());
             currentTask.setRecipients(
-                    parseRecipients(recipientsTextField.getText()));
+                    parseRecipients(recipientsTextField.getText())
+            );
             currentTask.setContent(contentTextField.getText());
 
-            nameSettingsPairs.put(x, currentTask);
+            nameSettingsPairs.put(x.replaceAll("[^a-zA-Z0-9]",""), currentTask);
         }
         return nameSettingsPairs;
     }
 
-    //TODO
-    private TaskSettings makeSettingsFromOne(){
-        return null;
+
+
+    //TODO TODO TODO TODO TODO TODO TODO TODO
+    private void makeSettingsFromOne(){
+        String replacedString
+                = this.selectedTask.toString().replaceAll("[^a-zA-Z0-9]","");
+        TaskSettings currTask = settingsMap.get(replacedString);
+
+        currTask.setName(
+                this.nameTextField.getText()
+        );
+        currTask.setSender(
+                this.senderTextField.getText()
+        );
+        currTask.setRecipients(
+                parseRecipients(this.recipientsTextField.getText())
+        );
+        currTask.setContent(
+                this.contentTextField.getText()
+        );
+
+        settingsMap.put(replacedString, currTask);
     }
 
     //TODO: COMPLETE WHEN ATTRIBUTES OF EACH TASK IS FINISHED
@@ -120,6 +150,7 @@ public class MainGUI {
         this.taskList = new TaskList(primaryStage, this);
         taskList.initializeList();
         taskList.getListView().setOnMouseClicked(evt -> {
+            this.makeEditable();
             if(!taskSelected){
                 selectedTask
                         = taskList.getListView().getSelectionModel().getSelectedItem();
@@ -131,6 +162,8 @@ public class MainGUI {
                     //In this if statement, cursed code
                     if(taskList.getSize() != 0){
                         if(taskList.getListView().getSelectionModel().getSelectedItem().equals(selectedTask)){
+                            //Selects a null element so that the program
+                            //un-selects a selected element
                             taskList.getListView().getSelectionModel().select(-1);
                             taskSelected = false;
                         }
@@ -139,6 +172,12 @@ public class MainGUI {
                             selectedTask
                                     = taskList.getListView().getSelectionModel().getSelectedItem();
 
+                            TaskSettings currSettings
+                                    = this.settingsMap.get(selectedTask.toString().replaceAll("[^a-zA-Z0-9]",""));
+                            doNot = true;
+                            this.clearFields();
+                            this.loadFieldText(selectedTask.toString().replaceAll("[^a-zA-Z0-9]",""));
+                            doNot = false;
                         }
                     }
 
@@ -166,6 +205,19 @@ public class MainGUI {
             }
         });
         botBox.getChildren().addAll(newTaskButton, deleteTaskButton);
+    }
+
+    private void loadFieldText(String fieldName){
+        fieldName = fieldName.replaceAll("[^a-zA-Z0-9]", "");
+        if(!this.settingsMap.containsKey(fieldName)){
+            return;
+        }
+
+        TaskSettings currentSettings = this.settingsMap.get(fieldName);
+        this.nameTextField.setText(currentSettings.getName());
+        this.senderTextField.setText(currentSettings.getSender());
+        this.recipientsTextField.setText(currentSettings.getRecipientsText());
+        this.contentTextField.setText(currentSettings.getContent());
     }
 
     private void setupSettings(){
@@ -202,6 +254,7 @@ public class MainGUI {
         contentTextField.setPrefHeight(200);
         this.layoutCorrection(contentTextField);
         GridPane.setConstraints(contentTextField, 1, 3);
+
 
         midBox.getChildren().addAll(
                 nameDescription, nameTextField, senderBoxDescription,
@@ -285,51 +338,67 @@ public class MainGUI {
     }
 
     private void setupInputListeners(){
-        nameTextField.textProperty().addListener(e -> this.makeUnsaved());
-        senderTextField.textProperty().addListener(e -> this.makeUnsaved());
-        recipientsTextField.textProperty().addListener(e -> this.makeUnsaved());
-        contentTextField.textProperty().addListener(e ->this.makeUnsaved());
+        nameTextField.textProperty().addListener(e -> {
+            if(doNot){
+                return;
+            }
+            this.makeUnsaved();
+            this.makeSettingsFromOne();
+        });
+        senderTextField.textProperty().addListener(e -> {
+            if(doNot){
+                return;
+            }
+            this.makeUnsaved();
+            this.makeSettingsFromOne();
+        });
+        recipientsTextField.textProperty().addListener(e -> {
+            if(doNot){
+                return;
+            }
+            this.makeUnsaved();
+            this.makeSettingsFromOne();
+        });
+        contentTextField.textProperty().addListener(e -> {
+            if(doNot){
+                return;
+            }
+            this.makeUnsaved();
+            this.makeSettingsFromOne();
+        });
     }
 
     private void makeUnsaved(){
-        System.out.println("MAKE UNSAVED");
         if(!taskSelected){
             return;
         }
 
-        this.saved = false;
         String selectedString = this.selectedTask.toString();
         int index = this.taskList.getItems().indexOf(selectedString);
         if(index == -1){
             return;
         }
 
-        System.out.println("WOWO");
         if(this.taskList.getItems().get(index).charAt(selectedString.length() - 1) == '*'){
             return;
         }
-        System.out.println("WOWOO@");
         this.taskList.getItems().set(index, selectedString+"*");
         this.refreshSelectedTask();
     }
 
     private void makeSaved(){
-        System.out.println("MAKE SAVED");
         if(!taskSelected){
             return;
         }
 
-        this.saved = true;
         String selectedString = this.selectedTask.toString();
         int index = this.taskList.getItems().indexOf(selectedString);
         if(index == -1){
             return;
         }
-        System.out.println("NICE");
         if(this.taskList.getItems().get(index).charAt(selectedString.length() - 1) != '*'){
             return;
         }
-        System.out.println("NICE2");
         this.taskList.getItems().set(
                 index, selectedString.substring(0, selectedString.length() - 1));
         this.refreshSelectedTask();
@@ -338,5 +407,37 @@ public class MainGUI {
     private void refreshSelectedTask(){
         this.selectedTask
                 = taskList.getListView().getSelectionModel().getSelectedItem();
+    }
+
+    //Assigns light grey CSS coloring to input fields and makes them uneditable
+    private void makeUneditable(){
+        nameTextField.setEditable(false);
+        nameTextField.setStyle("-fx-background-color: #D3D3D3;");
+        senderTextField.setEditable(false);
+        senderTextField.setStyle("-fx-background-color: #D3D3D3;");
+        recipientsTextField.setEditable(false);
+        recipientsTextField.setStyle("-fx-background-color: #D3D3D3;");
+        contentTextField.getStyleClass().add("application/application.css");
+        contentTextField.setEditable(false);
+    }
+
+    //Clears CSS styling for input fields and makes them editable
+    private void makeEditable(){
+        nameTextField.setEditable(true);
+        nameTextField.setStyle(null);
+        senderTextField.setEditable(true);
+        senderTextField.setStyle(null);
+        recipientsTextField.setEditable(true);
+        recipientsTextField.setStyle(null);
+        contentTextField.setEditable(true);
+        contentTextField.getStyleClass().clear();
+        contentTextField.setStyle(null);
+    }
+
+    private void printAllSenders(){
+        for(String x: this.settingsMap.keySet()){
+            System.out.println(x + " " + this.settingsMap.get(x).getName());
+        }
+        System.out.println("------------");
     }
 }

@@ -5,14 +5,19 @@ import javafx.stage.Stage;
 
 import gui.MainGUI;
 
+import java.util.Scanner;
+
 public class Main extends Application {
+    public static MainGUI gui;
+
     @Override
     public void start(Stage primaryStage) {
-        MainGUI gui = new MainGUI();
+        gui = new MainGUI();
         gui.start(primaryStage);
     }
 
     public static void main(String[] args) {
+
         launch(args);
     }
 }

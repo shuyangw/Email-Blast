@@ -30,7 +30,7 @@ public class Toolbar {
     private void makeBar(){
         Menu file = new Menu("File");
         MenuItem newTaskButton = new MenuItem("New Task");
-        newTaskButton.setOnAction(evt -> {
+        newTaskButton.setOnAction(evt ->{
             this.parent.getTaskList().addToTaskList("Unnamed");
         });
 

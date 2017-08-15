@@ -11,6 +11,13 @@ public class TaskSettings implements Serializable{
     private ArrayList<String> recipients;
     private String content;
 
+    public TaskSettings(){
+        this.name = "";
+        this.sender = "";
+        this.recipients = new ArrayList<>();
+        this.content = "";
+    }
+
     public String getName(){
         return this.name;
     }
@@ -21,6 +28,14 @@ public class TaskSettings implements Serializable{
 
     public ArrayList<String> getRecipients(){
         return this.recipients;
+    }
+
+    public String getRecipientsText(){
+        String recipients = "";
+        for(String recipient: this.recipients){
+            recipients += recipient;
+        }
+        return recipients;
     }
 
     public String getContent() {
@@ -41,5 +56,12 @@ public class TaskSettings implements Serializable{
 
     public void setRecipients(ArrayList<String> recipients) {
         this.recipients = recipients;
+    }
+
+    public void printElements(){
+        System.out.println(this.name);
+        System.out.println(this.sender);
+        System.out.println(this.getRecipientsText());
+        System.out.println(this.content);
     }
 }
