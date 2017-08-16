@@ -11,11 +11,25 @@ public class TaskSettings implements Serializable{
     private ArrayList<String> recipients;
     private String content;
 
+    //Preliminary other values
+    private boolean oneTimeOrNot;
+    private String startDate;
+    private String startTime;
+    private int frequencyMinutes;
+    private int frequencyHours;
+
     public TaskSettings(){
         this.name = "";
         this.sender = "";
         this.recipients = new ArrayList<>();
         this.content = "";
+
+        //Must change
+        this.oneTimeOrNot = false;
+        this.startDate = "";
+        this.startTime = "";
+        this.frequencyMinutes = 0;
+        this.frequencyHours = 0;
     }
 
     public String getName(){
@@ -58,10 +72,44 @@ public class TaskSettings implements Serializable{
         this.recipients = recipients;
     }
 
-    public void printElements(){
-        System.out.println(this.name);
-        System.out.println(this.sender);
-        System.out.println(this.getRecipientsText());
-        System.out.println(this.content);
+    public boolean isOneTimeOrNot() {
+        return oneTimeOrNot;
     }
+
+    public void setOneTimeOrNot(boolean oneTimeOrNot) {
+        this.oneTimeOrNot = oneTimeOrNot;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public int getFrequencyMinutes() {
+        return frequencyMinutes;
+    }
+
+    public void setFrequencyMinutes(int frequencyMinutes) {
+        this.frequencyMinutes = frequencyMinutes;
+    }
+
+    public int getFrequencyHours() {
+        return frequencyHours;
+    }
+
+    public void setFrequencyHours(int frequencyHours) {
+        this.frequencyHours = frequencyHours;
+    }
+
 }

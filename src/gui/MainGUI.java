@@ -16,10 +16,9 @@ import java.util.Optional;
 
 public class MainGUI {
     private final int RIGHT_TRANSLATE = 5;
-    private final int VERTICAL_TRANSLATE = 5;
+    private final int VERTICAL_TRANSLATE = 8;
 
     private Stage primaryStage;
-    private VBox topBox;
     private VBox leftBox;
     private HBox botBox;
     private GridPane midBox;
@@ -34,6 +33,14 @@ public class MainGUI {
     private TextField senderTextField;
     private TextField recipientsTextField;
     private TextArea contentTextField;
+    private CheckBox oneTimeCheckBox;
+    private TextField atDateTextField;
+    private TextField atTimeTextField;
+    private CheckBox repeatCheckBox;
+    private TextField fromDateTextField;
+    private TextField fromTimeTextField;
+    private TextField freqMinTextField;
+    private TextField freqHoursTextField;
 
     public void start(Stage primaryStage){
         this.primaryStage = primaryStage;
@@ -46,7 +53,7 @@ public class MainGUI {
 
         //Setup border pane and VBox and HBox
         BorderPane borderPane = new BorderPane();
-        this.topBox = new VBox();
+        VBox topBox = new VBox();
         this.leftBox = new VBox();
         this.botBox = new HBox();
         this.midBox = new GridPane();
@@ -107,9 +114,6 @@ public class MainGUI {
         return nameSettingsPairs;
     }
 
-
-
-    //TODO TODO TODO TODO TODO TODO TODO TODO
     private void makeSettingsFromOne(){
         String replacedString
                 = this.selectedTask.toString().replaceAll("[^a-zA-Z0-9]","");
@@ -172,15 +176,12 @@ public class MainGUI {
                             selectedTask
                                     = taskList.getListView().getSelectionModel().getSelectedItem();
 
-                            TaskSettings currSettings
-                                    = this.settingsMap.get(selectedTask.toString().replaceAll("[^a-zA-Z0-9]",""));
                             doNot = true;
                             this.clearFields();
                             this.loadFieldText(selectedTask.toString().replaceAll("[^a-zA-Z0-9]",""));
                             doNot = false;
                         }
                     }
-
                 }
                 catch(Exception e){
                     e.printStackTrace();
@@ -221,45 +222,154 @@ public class MainGUI {
     }
 
     private void setupSettings(){
+        //Row 0 - Name field
         final Text nameDescription = new Text("Name");
         this.layoutCorrection(nameDescription);
         GridPane.setConstraints(nameDescription, 0, 0);
+
         this.nameTextField = new TextField();
         this.layoutCorrection(nameTextField);
-        this.nameTextField.setPrefWidth(200);
+        this.nameTextField.setPrefWidth(250);
         GridPane.setConstraints(nameTextField, 1, 0);
 
+        //Row 1 - Sender field
         final Text senderBoxDescription = new Text("Sender:");
         this.layoutCorrection(senderBoxDescription);
         GridPane.setConstraints(senderBoxDescription, 0, 1);
+
         this.senderTextField = new TextField();
-        this.senderTextField.setPrefWidth(200);
+        this.senderTextField.setPrefWidth(250);
         this.layoutCorrection(senderTextField);
         GridPane.setConstraints(senderTextField, 1, 1);
 
+        //Row 2 - Recipients field
         final Text recipientBoxDescription = new Text("Recipients:");
         this.layoutCorrection(recipientBoxDescription);
         GridPane.setConstraints(recipientBoxDescription, 0, 2);
+
         this.recipientsTextField = new TextField();
-        this.recipientsTextField.setPrefWidth(200);
+        this.recipientsTextField.setPrefWidth(250);
         this.layoutCorrection(recipientsTextField);
         GridPane.setConstraints(recipientsTextField, 1, 2);
 
+        //Row 3 - Content field
         final Text contentDescription = new Text("Content:");
         this.layoutCorrection(contentDescription);
         contentDescription.setTranslateY(-85);
         GridPane.setConstraints(contentDescription, 0, 3);
+
         this.contentTextField = new TextArea();
-        this.contentTextField.setPrefWidth(200);
+        this.contentTextField.setPrefWidth(250);
         contentTextField.setPrefHeight(200);
         this.layoutCorrection(contentTextField);
         GridPane.setConstraints(contentTextField, 1, 3);
 
+        //Row 4 - One time checkbox
+        final Text oneTimeDescription = new Text("One time:");
+        this.layoutCorrection(oneTimeDescription);
+        GridPane.setConstraints(oneTimeDescription, 0, 4);
+
+        this.oneTimeCheckBox = new CheckBox();
+        this.layoutCorrection(oneTimeCheckBox);
+        GridPane.setConstraints(oneTimeCheckBox, 1, 4);
+
+        //Row 5 - If one time, select date and time
+        final Text atTime = new Text("At");
+        this.layoutCorrection(atTime);
+        GridPane.setConstraints(atTime, 0, 5);
+
+        final Text atDateInputDescription = new Text("Date:");
+        this.layoutCorrection(atDateInputDescription);
+        GridPane.setConstraints(atDateInputDescription, 1, 5);
+
+        this.atDateTextField = new TextField();
+        this.layoutCorrection(atDateTextField);
+        atDateTextField.setPrefWidth(50);
+        atDateTextField.setTranslateX(-150);
+        GridPane.setConstraints(atDateTextField, 2, 5);
+
+        final Text atTimeInputDescription = new Text("Time:");
+        this.layoutCorrection(atTimeInputDescription);
+        atTimeInputDescription.setTranslateX(-150);
+        GridPane.setConstraints(atTimeInputDescription, 3, 5);
+
+        this.atTimeTextField = new TextField();
+        this.layoutCorrection(atTimeTextField);
+        atTimeTextField.setPrefWidth(50);
+        atTimeTextField.setTranslateX(-155);
+        GridPane.setConstraints(atTimeTextField, 4, 5);
+
+        //Row 6 - Repeating checkbox
+        final Text repeatingDescription = new Text("Repeating:");
+        this.layoutCorrection(repeatingDescription);
+        GridPane.setConstraints(repeatingDescription, 0, 6);
+
+        this.repeatCheckBox = new CheckBox();
+        this.layoutCorrection(repeatCheckBox);
+        GridPane.setConstraints(repeatCheckBox, 1, 6);
+
+        //Row 7 - If repeating, start from date/time
+        Text fromTime = new Text("From");
+        this.layoutCorrection(fromTime);
+        GridPane.setConstraints(fromTime, 0, 7);
+
+        final Text fromDateInputDescription = new Text("Date:");
+        this.layoutCorrection(fromDateInputDescription);
+        GridPane.setConstraints(fromDateInputDescription, 1, 7);
+
+        this.fromDateTextField = new TextField();
+        this.layoutCorrection(fromDateTextField);
+        fromDateTextField.setPrefWidth(50);
+        fromDateTextField.setTranslateX(-150);
+        GridPane.setConstraints(fromDateTextField, 2, 7);
+
+        final Text fromTimeInputDescription = new Text("Time:");
+        this.layoutCorrection(fromTimeInputDescription);
+        fromTimeInputDescription.setTranslateX(-150);
+        GridPane.setConstraints(fromTimeInputDescription, 3, 7);
+
+        this.fromTimeTextField = new TextField();
+        this.layoutCorrection(fromTimeTextField);
+        fromTimeTextField.setPrefWidth(50);
+        fromTimeTextField.setTranslateX(-155);
+        GridPane.setConstraints(fromTimeTextField, 4, 7);
+
+        //Row 8 - If repeating, declares frequency
+        final Text frequencyDescription = new Text("Frequency");
+        this.layoutCorrection(frequencyDescription);
+        GridPane.setConstraints(frequencyDescription, 0, 8);
+
+        final Text minutesFreqInput = new Text("Minutes:");
+        this.layoutCorrection(minutesFreqInput);
+        GridPane.setConstraints(minutesFreqInput, 1, 8);
+
+        this.freqMinTextField = new TextField();
+        this.layoutCorrection(freqMinTextField);
+        freqMinTextField.setPrefWidth(100);
+        freqMinTextField.setTranslateX(-130);
+        GridPane.setConstraints(freqMinTextField, 2, 8);
+
+        final Text hoursFreqInput = new Text("Hours:");
+        this.layoutCorrection(hoursFreqInput);
+        hoursFreqInput.setTranslateX(-130);
+        GridPane.setConstraints(hoursFreqInput, 3, 8);
+
+        this.freqHoursTextField = new TextField();
+        this.layoutCorrection(freqHoursTextField);
+        freqHoursTextField.setPrefWidth(100);
+        freqHoursTextField.setTranslateX(-130);
+        GridPane.setConstraints(freqHoursTextField, 4, 8); 
 
         midBox.getChildren().addAll(
                 nameDescription, nameTextField, senderBoxDescription,
                 senderTextField, recipientBoxDescription, recipientsTextField,
-                contentDescription, contentTextField
+                contentDescription, contentTextField, oneTimeDescription,
+                oneTimeCheckBox, atTime, atDateInputDescription,
+                atDateTextField, atTimeInputDescription, atTimeTextField,
+                repeatingDescription, repeatCheckBox, fromTime,
+                fromDateInputDescription, fromDateTextField,
+                fromTimeInputDescription, fromTimeTextField, frequencyDescription,
+                minutesFreqInput, freqMinTextField, hoursFreqInput, freqHoursTextField
         );
     }
 
@@ -306,16 +416,7 @@ public class MainGUI {
         return recipientList;
     }
 
-    private boolean areFieldsEmpty(){
-        boolean nameFieldEmpty = nameTextField.getText().isEmpty();
-        boolean senderTextFieldEmpty = senderTextField.getText().isEmpty();
-        boolean recipientsTextFieldEmpty = recipientsTextField.getText().isEmpty();
-        boolean contentTextFieldEmpty = contentTextField.getText().isEmpty();
-
-        return nameFieldEmpty && senderTextFieldEmpty
-                && recipientsTextFieldEmpty && contentTextFieldEmpty;
-    }
-
+    //Clears every input field with a warning dialog
     private void clearFieldsWithWarning(){
         Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle("Warning");
@@ -330,6 +431,7 @@ public class MainGUI {
         }
     }
 
+    //Clears every input field without warning
     private void clearFields(){
         nameTextField.clear();
         senderTextField.clear();
@@ -337,6 +439,7 @@ public class MainGUI {
         contentTextField.clear();
     }
 
+    //Sets up the listeners for changes in user input settings
     private void setupInputListeners(){
         nameTextField.textProperty().addListener(e -> {
             if(doNot){
@@ -413,31 +516,90 @@ public class MainGUI {
     private void makeUneditable(){
         nameTextField.setEditable(false);
         nameTextField.setStyle("-fx-background-color: #D3D3D3;");
+
         senderTextField.setEditable(false);
         senderTextField.setStyle("-fx-background-color: #D3D3D3;");
+
         recipientsTextField.setEditable(false);
         recipientsTextField.setStyle("-fx-background-color: #D3D3D3;");
+
         contentTextField.getStyleClass().add("application/application.css");
         contentTextField.setEditable(false);
+
+        oneTimeCheckBox.setDisable(true);
+
+        this.disableOneTime();
+
+        repeatCheckBox.setDisable(true);
+
+        this.disableRepeating();
     }
 
     //Clears CSS styling for input fields and makes them editable
     private void makeEditable(){
         nameTextField.setEditable(true);
         nameTextField.setStyle(null);
+
         senderTextField.setEditable(true);
         senderTextField.setStyle(null);
+
         recipientsTextField.setEditable(true);
         recipientsTextField.setStyle(null);
+
         contentTextField.setEditable(true);
         contentTextField.getStyleClass().clear();
         contentTextField.setStyle(null);
+
+        oneTimeCheckBox.setDisable(false);
+
+        this.enableOneTime();
+
+        repeatCheckBox.setDisable(false);
+
+        this.enableRepeating();
     }
 
-    private void printAllSenders(){
-        for(String x: this.settingsMap.keySet()){
-            System.out.println(x + " " + this.settingsMap.get(x).getName());
-        }
-        System.out.println("------------");
+    private void disableOneTime(){
+        atDateTextField.setEditable(false);
+        atDateTextField.setStyle("-fx-background-color: #D3D3D3;");
+
+        atTimeTextField.setEditable(false);
+        atTimeTextField.setStyle("-fx-background-color: #D3D3D3;");
+    }
+
+    private void enableOneTime(){
+        atDateTextField.setEditable(true);
+        atDateTextField.setStyle(null);
+
+        atTimeTextField.setEditable(true);
+        atTimeTextField.setStyle(null);
+    }
+
+    private void disableRepeating(){
+        fromDateTextField.setEditable(false);
+        fromDateTextField.setStyle("-fx-background-color: #D3D3D3;");
+
+        fromTimeTextField.setEditable(false);
+        fromTimeTextField.setStyle("-fx-background-color: #D3D3D3;");
+
+        freqMinTextField.setEditable(false);
+        freqMinTextField.setStyle("-fx-background-color: #D3D3D3;");
+
+        freqHoursTextField.setEditable(false);
+        freqHoursTextField.setStyle("-fx-background-color: #D3D3D3;");
+    }
+
+    private void enableRepeating(){
+        fromDateTextField.setEditable(true);
+        fromDateTextField.setStyle(null);
+
+        fromTimeTextField.setEditable(true);
+        fromTimeTextField.setStyle(null);
+
+        freqMinTextField.setEditable(true);
+        freqMinTextField.setStyle(null);
+
+        freqHoursTextField.setEditable(true);
+        freqHoursTextField.setStyle(null);
     }
 }
