@@ -24,6 +24,7 @@ public class MainGUI {
 
     //Regex for clearing asterisks
     private final String REGEX_AST = "[^a-zA-Z0-9]";
+    private final String REGEX_SPACE = " ";
 
     private Stage primaryStage;
     private VBox leftBox;
@@ -327,7 +328,7 @@ public class MainGUI {
 
     private void setupSettings(){
         //Row 0 - Name field
-        final Text nameDescription = new Text("Name");
+        final Text nameDescription = new Text("Subject");
         int TYPE_TEXT = 4;
         correctElement(TYPE_TEXT, nameDescription, 0, 0, -1, -1, 0, 0);
         nameTextField = new TextField();
@@ -442,8 +443,7 @@ public class MainGUI {
         for(int i = 0; i < input.length(); i++){
             if(input.charAt(i) == '@'){
                 while(i < input.length() && input.charAt(i) != ','){
-                    currentEmail += input.charAt(i);
-                    ++i;
+                    currentEmail += input.charAt(i++);
                 }
                 recipientList.add(currentEmail);
                 if(i == input.length()){
@@ -534,6 +534,24 @@ public class MainGUI {
             if(doNot){
                 return;
             }
+            if(nameTextField.getText().isEmpty()){
+                showErrorAlert("Subject field cannot be empty!");
+                return;
+            }
+            else if(senderTextField.getText().isEmpty()){
+                showErrorAlert("Semder field cannot be empty!");
+                return;
+            }
+            else if(recipientsTextField.getText().isEmpty()){
+                showErrorAlert("Recipients field cannot be empty!");
+                return;
+            }
+            if(contentTextField.getText().isEmpty()){
+                if(!showConfirmationAlert("Content field is empty, would you" +
+                        " like to continue?")){
+                    return;
+                }
+            }
             makeUnsaved();
             makeSettingsFromOne();
         });
@@ -565,7 +583,7 @@ public class MainGUI {
             selectedString = selectedTask.toString();
         }
         catch(NullPointerException e){
-            noTaskSelectedAlert();
+            showErrorAlert("Please select a task before editing");
             return;
         }
 
@@ -581,13 +599,7 @@ public class MainGUI {
         refreshSelectedTask();
     }
 
-    private void noTaskSelectedAlert(){
-        Alert alert = new Alert(AlertType.ERROR);
-        alert.setTitle("Error!");
-        alert.setHeaderText("Error!");
-        alert.setContentText("Please select a task before editing");
-        alert.showAndWait();
-    }
+
 
     private void makeSaved(){
         if(!taskSelected){
@@ -704,5 +716,22 @@ public class MainGUI {
         enable(fromTimeTextField, TYPE_TEXTFIELD);
         enable(freqMinTextField, TYPE_TEXTFIELD);
         enable(freqHoursTextField, TYPE_TEXTFIELD);
+    }
+
+    private void showErrorAlert(String contentText){
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle("Error!");
+        alert.setHeaderText("Error!");
+        alert.setContentText(contentText);
+        alert.showAndWait();
+    }
+
+    private boolean showConfirmationAlert(String contentText){
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle("Error!");
+        alert.setHeaderText("Error!");
+        alert.setContentText(contentText);
+        Optional<ButtonType> result = alert.showAndWait();
+        return result.isPresent() && result.get() == ButtonType.OK;
     }
 }
