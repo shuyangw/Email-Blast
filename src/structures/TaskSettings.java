@@ -12,11 +12,19 @@ public class TaskSettings implements Serializable{
     private String content;
 
     //Preliminary other values
-    private boolean oneTimeOrNot;
-    private String startDate;
-    private String startTime;
-    private int frequencyMinutes;
-    private int frequencyHours;
+    private Boolean oneTimeOrNot;
+    private String atDate;
+    private String atTime;
+    private String fromDate;
+    private String fromTime;
+    private String frequencyMinutes;
+    private String frequencyHours;
+
+    //Non-data fields
+    private boolean active;
+    private boolean daemon;
+    //Not even sure if will work sad face
+    private boolean cloud;
 
     public TaskSettings(){
         this.name = "";
@@ -25,11 +33,13 @@ public class TaskSettings implements Serializable{
         this.content = "";
 
         //Must change
-        this.oneTimeOrNot = false;
-        this.startDate = "";
-        this.startTime = "";
-        this.frequencyMinutes = 0;
-        this.frequencyHours = 0;
+        this.oneTimeOrNot = null;
+        this.atDate = "";
+        this.atTime = "";
+        this.fromDate = "";
+        this.fromTime = "";
+        this.frequencyMinutes = "";
+        this.frequencyHours = "";
     }
 
     public String getName(){
@@ -40,6 +50,7 @@ public class TaskSettings implements Serializable{
         return this.sender;
     }
 
+    @SuppressWarnings("unused")
     public ArrayList<String> getRecipients(){
         return this.recipients;
     }
@@ -72,44 +83,105 @@ public class TaskSettings implements Serializable{
         this.recipients = recipients;
     }
 
-    public boolean isOneTimeOrNot() {
+    public Boolean getOneTimeOrNot() {
         return oneTimeOrNot;
     }
 
-    public void setOneTimeOrNot(boolean oneTimeOrNot) {
+    public void setOneTimeOrNot(Boolean oneTimeOrNot) {
         this.oneTimeOrNot = oneTimeOrNot;
     }
 
-    public String getStartDate() {
-        return startDate;
+    public String getAtDate() {
+        return atDate;
     }
 
-    public void setStartDate(String startDate) {
-        this.startDate = startDate;
+    public void setAtDate(String atDate) {
+        this.atDate = atDate;
     }
 
-    public String getStartTime() {
-        return startTime;
+    public String getAtTime() {
+        return atTime;
     }
 
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
+    public void setAtTime(String atTime) {
+        this.atTime = atTime;
     }
 
-    public int getFrequencyMinutes() {
+    public String getFrequencyMinutes() {
         return frequencyMinutes;
     }
 
-    public void setFrequencyMinutes(int frequencyMinutes) {
+    public void setFrequencyMinutes(String frequencyMinutes) {
         this.frequencyMinutes = frequencyMinutes;
     }
 
-    public int getFrequencyHours() {
+    public String getFrequencyHours() {
         return frequencyHours;
     }
 
-    public void setFrequencyHours(int frequencyHours) {
+    public void setFrequencyHours(String frequencyHours) {
         this.frequencyHours = frequencyHours;
     }
 
+    public String getFromDate() {
+        return fromDate;
+    }
+
+    public void setFromDate(String fromDate) {
+        this.fromDate = fromDate;
+    }
+
+    public String getFromTime() {
+        return fromTime;
+    }
+
+    public void setFromTime(String fromTime) {
+        this.fromTime = fromTime;
+    }
+
+    @SuppressWarnings("unused")
+    public void printAll(){
+        System.out.println("\nTask name: " + name);
+        System.out.println("Sender name: " + sender);
+        System.out.println("Recipients: " + getRecipientsText());
+        System.out.println("Content: " + content);
+        System.out.println("One time: " + oneTimeOrNot);
+        if(oneTimeOrNot != null){
+            if(oneTimeOrNot){
+                System.out.println("At date: " + atDate);
+                System.out.println("At time: " + atTime);
+            }
+            else{
+                System.out.println("From date: " + fromDate);
+                System.out.println("From from: " + fromTime);
+                System.out.println("Frequency minutes: " + frequencyMinutes);
+                System.out.println("Frequency hours: " + frequencyHours + "\n");
+            }
+        }
+
+    }
+
+    public boolean getActive() {
+        return active;
+    }
+
+    public void setActive(boolean running) {
+        this.active = running;
+    }
+
+    public boolean getDaemon() {
+        return daemon;
+    }
+
+    public void setDaemon(boolean daemon) {
+        this.daemon = daemon;
+    }
+
+    public boolean getCloud() {
+        return cloud;
+    }
+
+    public void setCloud(boolean cloud) {
+        this.cloud = cloud;
+    }
 }

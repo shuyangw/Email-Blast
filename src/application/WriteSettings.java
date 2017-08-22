@@ -38,7 +38,7 @@ public class WriteSettings {
             if (objOutStream == null) {
                 try {
                     objOutStream.close();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 

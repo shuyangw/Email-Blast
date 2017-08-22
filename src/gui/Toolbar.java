@@ -79,6 +79,7 @@ public class Toolbar {
         });
         edit.getItems().add(sortTasks);
 
+        //TODO: FINISH HELP
         Menu help = new Menu("Help");
 
         // Add Menu items here

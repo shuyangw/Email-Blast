@@ -5,8 +5,6 @@ import javafx.stage.Stage;
 
 import gui.MainGUI;
 
-import java.util.Scanner;
-
 public class Main extends Application {
     public static MainGUI gui;
 
