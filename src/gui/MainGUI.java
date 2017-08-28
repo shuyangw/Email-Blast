@@ -1,5 +1,6 @@
 package gui;
 
+import application.EmailActions;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -12,10 +13,11 @@ import structures.TaskSettings;
 
 import java.util.HashMap;
 import java.util.ArrayList;
-import java.util.Optional;
 
 public class MainGUI {
-    //Constants
+    private final AlertManager alertManager = new AlertManager();
+
+    //consts
     private final int RIGHT_TRANSLATE = 5;
     private final int VERTICAL_TRANSLATE = 8;
     private final int TYPE_TEXTFIELD = 1;
@@ -24,7 +26,6 @@ public class MainGUI {
 
     //Regex for clearing asterisks
     private final String REGEX_AST = "[^a-zA-Z0-9]";
-    private final String REGEX_SPACE = " ";
 
     private Stage primaryStage;
     private VBox leftBox;
@@ -36,6 +37,7 @@ public class MainGUI {
     private Object selectedTask;
     private boolean doNot;
     private HashMap<String, TaskSettings> settingsMap;
+    private HashMap<String, TaskSettings> savedSettingsMap;
 
     private ArrayList<Node> textFieldList;
 
@@ -152,6 +154,7 @@ public class MainGUI {
 
         if(currTask == null){
             System.err.println("currTask field is null");
+            return;
         }
 
         currTask.setName(nameTextField.getText());
@@ -237,6 +240,9 @@ public class MainGUI {
     private void setupListElements(){
         taskList = new TaskList(primaryStage, this);
         taskList.initializeList();
+        if(!taskList.getItems().isEmpty()){
+            makeUnsaved();
+        }
         taskList.getListView().setOnMouseClicked(evt -> {
             enableAll();
             if(!taskSelected){
@@ -461,12 +467,11 @@ public class MainGUI {
 
     //Clears every input field with a warning dialog
     private void clearFieldsWithWarning(){
-        Alert alert = new Alert(AlertType.CONFIRMATION);
-        alert.setTitle("Warning");
-        alert.setHeaderText("Warning");
-        alert.setContentText("Are you sure you want to clear all inputs?");
-        Optional<ButtonType> result = alert.showAndWait();
-        if(result.isPresent() && result.get() == ButtonType.OK){
+        boolean userAnswer = alertManager.booleanAlert(
+                AlertType.CONFIRMATION, "Warning!", "Warning",
+                "Are you sure you want to clear all inputs?"
+        );
+        if(userAnswer){
             for(Node element: textFieldList){
                 ((TextField)element).clear();
             }
@@ -474,6 +479,15 @@ public class MainGUI {
             oneTimeCheckBox.setSelected(false);
             repeatCheckBox.setSelected(false);
         }
+
+//        Alert alert = new Alert(AlertType.CONFIRMATION);
+//        alert.setTitle("Warning");
+//        alert.setHeaderText("Warning");
+//        alert.setContentText("Are you sure you want to clear all inputs?");
+//        Optional<ButtonType> result = alert.showAndWait();
+//        if(result.isPresent() && result.get() == ButtonType.OK){
+//
+//        }
     }
 
     //Clears every input field without warning
@@ -534,26 +548,7 @@ public class MainGUI {
             if(doNot){
                 return;
             }
-            if(nameTextField.getText().isEmpty()){
-                showErrorAlert("Subject field cannot be empty!");
-                return;
-            }
-            else if(senderTextField.getText().isEmpty()){
-                showErrorAlert("Semder field cannot be empty!");
-                return;
-            }
-            else if(recipientsTextField.getText().isEmpty()){
-                showErrorAlert("Recipients field cannot be empty!");
-                return;
-            }
-            if(contentTextField.getText().isEmpty()){
-                if(!showConfirmationAlert("Content field is empty, would you" +
-                        " like to continue?")){
-                    return;
-                }
-            }
-            makeUnsaved();
-            makeSettingsFromOne();
+            activeCheckBoxActions();
         });
         contentTextField.textProperty().addListener(e -> {
             if(doNot){
@@ -578,7 +573,7 @@ public class MainGUI {
             return;
         }
         refreshSelectedTask();
-        String selectedString = "";
+        String selectedString;
         try{
             selectedString = selectedTask.toString();
         }
@@ -587,6 +582,7 @@ public class MainGUI {
             return;
         }
 
+        primaryStage.setTitle("Email Blast*");
         int index = taskList.getItems().indexOf(selectedString);
         if(index == -1){
             return;
@@ -606,6 +602,7 @@ public class MainGUI {
             return;
         }
 
+        primaryStage.setTitle("Email Blast");
         String selectedString = selectedTask.toString();
         int index = taskList.getItems().indexOf(selectedString);
         if(index == -1){
@@ -617,6 +614,7 @@ public class MainGUI {
         taskList.getItems().set(
                 index, selectedString.substring(0, selectedString.length() - 1));
         refreshSelectedTask();
+        savedSettingsMap.putAll(settingsMap);
     }
 
     private void refreshSelectedTask(){
@@ -718,20 +716,84 @@ public class MainGUI {
         enable(freqHoursTextField, TYPE_TEXTFIELD);
     }
 
+    //TODO: Debug later
     private void showErrorAlert(String contentText){
-        Alert alert = new Alert(AlertType.ERROR);
-        alert.setTitle("Error!");
-        alert.setHeaderText("Error!");
-        alert.setContentText(contentText);
-        alert.showAndWait();
+        alertManager.waitAlert(
+                AlertType.ERROR, "Error!", "Error!", contentText
+        );
+//        Alert alert = new Alert(AlertType.ERROR);
+//        alert.setTitle("Error!");
+//        alert.setHeaderText("Error!");
+//        alert.setContentText(contentText);
+//        alert.showAndWait();
     }
 
+    //TODO: Debug later
     private boolean showConfirmationAlert(String contentText){
-        Alert alert = new Alert(AlertType.CONFIRMATION);
-        alert.setTitle("Error!");
-        alert.setHeaderText("Error!");
-        alert.setContentText(contentText);
-        Optional<ButtonType> result = alert.showAndWait();
-        return result.isPresent() && result.get() == ButtonType.OK;
+        System.out.println("Show confirmation alert shown");
+        return alertManager.booleanAlert(
+                AlertType.CONFIRMATION, "Error!", "Error!", contentText
+        );
+//        Alert alert = new Alert(AlertType.CONFIRMATION);
+//        alert.setTitle("Error!");
+//        alert.setHeaderText("Error!");
+//        alert.setContentText(contentText);
+//        Optional<ButtonType> result = alert.showAndWait();
+//        return result.isPresent() && result.get() == ButtonType.OK;
+    }
+
+//==============================================================================
+// Activate email functionality
+//==============================================================================
+    private boolean activeEmailPrelimCheck(){
+        if(nameTextField.getText().isEmpty()){
+            showErrorAlert("Subject field cannot be empty!");
+            return false;
+        }
+        else if(senderTextField.getText().isEmpty()){
+            showErrorAlert("Sender field cannot be empty!");
+            return false;
+        }
+        else if(recipientsTextField.getText().isEmpty()){
+            showErrorAlert("Recipients field cannot be empty!");
+            return false;
+        }
+        if(contentTextField.getText().isEmpty()){
+            if(!showConfirmationAlert("Content field is empty, would you" +
+                    " like to continue?")){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void activeCheckBoxActions(){
+        if(!activeEmailPrelimCheck()){
+            System.err.println("Failed prelim check");
+            doNot = true;
+            activeCheckBox.setSelected(false);
+            doNot = false;
+            return;
+        }
+        makeUnsaved();
+        makeSettingsFromOne();
+        refreshSelectedTask();
+
+        if(selectedTask == null){
+            System.err.println("SELECTED TASK field is NULL");
+            return;
+        }
+        try{ //Runs when every field is a success
+            startEmail(settingsMap.get(selectedTask.toString()));
+            System.out.println("SUCCESS!!!!!!!!!!!!!");
+        }
+        catch(NullPointerException ex){
+            ex.printStackTrace();
+        }
+    }
+
+    private void startEmail(TaskSettings task){
+        EmailActions email = new EmailActions(task);
+        email.setup();
     }
 }

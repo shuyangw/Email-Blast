@@ -6,6 +6,7 @@ import javafx.stage.Stage;
 import gui.MainGUI;
 
 public class Main extends Application {
+    //Error constants
     public static MainGUI gui;
 
     @Override

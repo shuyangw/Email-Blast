@@ -18,13 +18,14 @@ public class EmailActions {
         this.currTask = currTask;
     }
 
-    public void promptPassword(){
+    public boolean promptPassword(){
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Password");
         dialog.setHeaderText("Please enter your password for the email account");
         dialog.setContentText("Please enter your password");
         Optional<String> result = dialog.showAndWait();
         password = result.isPresent() ? result.get() : "";
+        return !password.equals("");
     }
 
     public void setup(){
@@ -35,6 +36,12 @@ public class EmailActions {
         properties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         properties.put("mail.smtp.auth", "true");
         properties.put("mail.smtp.port", "465");
+
+        if(password == null || password.equals("")){
+            if(!promptPassword()){
+                return;
+            }
+        }
 
         session = Session.getDefaultInstance(properties,
                 new Authenticator(){
