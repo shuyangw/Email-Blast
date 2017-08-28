@@ -92,6 +92,7 @@ public class MainGUI {
         disableAll();
 
         settingsMap = makeSettings();
+        savedSettingsMap = new HashMap<>();
 
         //Setup scene and shows the application
         borderPane.setTop(topBox);
@@ -785,7 +786,6 @@ public class MainGUI {
         }
         try{ //Runs when every field is a success
             startEmail(settingsMap.get(selectedTask.toString()));
-            System.out.println("SUCCESS!!!!!!!!!!!!!");
         }
         catch(NullPointerException ex){
             ex.printStackTrace();
@@ -795,5 +795,8 @@ public class MainGUI {
     private void startEmail(TaskSettings task){
         EmailActions email = new EmailActions(task);
         email.setup();
+
+        System.out.println("SUCCESS!!!!!!!!!!!!!");
+        email.startEmail();
     }
 }
