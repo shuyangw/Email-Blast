@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.ArrayList;
 
 public class MainGUI {
+    private final boolean DEBUG = true;
+
     private final AlertManager alertManager = new AlertManager();
 
     //consts
@@ -371,11 +373,11 @@ public class MainGUI {
         final Text atDateInputDescription = new Text("Date:");
         correctElement(TYPE_TEXT, atDateInputDescription, 1, 5, -1, -1, 0, 0);
         atDateTextField = new TextField();
-        correctElement(TYPE_TEXTFIELD, atDateTextField, 2, 5, 50, -1, -140, 0);
+        correctElement(TYPE_TEXTFIELD, atDateTextField, 2, 5, 200, -1, -70, 0);
         final Text atTimeInputDescription = new Text("Time:");
-        correctElement(TYPE_TEXT, atTimeInputDescription, 3, 5, -1, -1, -140, 0);
+        correctElement(TYPE_TEXT, atTimeInputDescription, 3, 5, -1, -1, -70, 0);
         atTimeTextField = new TextField();
-        correctElement(TYPE_TEXTFIELD, atTimeTextField, 4, 5, 50, -1, -140, 0);
+        correctElement(TYPE_TEXTFIELD, atTimeTextField, 4, 5, 200, -1, -75, 0);
 
         //Row 6 - Repeating checkbox
         final Text repeatingDescription = new Text("Repeating:");
@@ -389,11 +391,11 @@ public class MainGUI {
         final Text fromDateInputDescription = new Text("Date:");
         correctElement(TYPE_TEXT, fromDateInputDescription, 1, 7, -1, -1, 0, 0);
         fromDateTextField = new TextField();
-        correctElement(TYPE_TEXTFIELD, fromDateTextField, 2, 7, 50, 0, -140, 0);
+        correctElement(TYPE_TEXTFIELD, fromDateTextField, 2, 7, 200, 0, -70, 0);
         final Text fromTimeInputDescription = new Text("Time:");
-        correctElement(TYPE_TEXT, fromTimeInputDescription, 3, 7, -1, -1, -140, 0);
+        correctElement(TYPE_TEXT, fromTimeInputDescription, 3, 7, -1, -1, -70, 0);
         fromTimeTextField = new TextField();
-        correctElement(TYPE_TEXTFIELD, fromTimeTextField, 4, 7 , 50, -1, -140, 0);
+        correctElement(TYPE_TEXTFIELD, fromTimeTextField, 4, 7 , 200, -1, -75, 0);
 
         //Row 8 - If repeating, declares frequency
         final Text frequencyDescription = new Text("Frequency:");
@@ -401,11 +403,11 @@ public class MainGUI {
         final Text minutesFreqInput = new Text("Minutes:");
         correctElement(TYPE_TEXT, minutesFreqInput, 1, 8, -1, -1, 0, 0);
         freqMinTextField = new TextField();
-        correctElement(TYPE_TEXTFIELD, freqMinTextField, 2, 8, 100, -1, -120, 0);
+        correctElement(TYPE_TEXTFIELD, freqMinTextField, 2, 8, 175, -1, -50, 0);
         final Text hoursFreqInput = new Text("Hours:");
-        correctElement(TYPE_TEXT, hoursFreqInput, 3, 8, -1, -1, -120, 0);
+        correctElement(TYPE_TEXT, hoursFreqInput, 3, 8, -1, -1, -50, 0);
         freqHoursTextField = new TextField();
-        correctElement(TYPE_TEXTFIELD, freqHoursTextField, 4, 8, 100, -1, -120, 0);
+        correctElement(TYPE_TEXTFIELD, freqHoursTextField, 4, 8, 175, -1, -50, 0);
 
         //Row 9, 10 - Special settings
         final Text daemonDescription = new Text("Run when closed:");
@@ -615,6 +617,7 @@ public class MainGUI {
         taskList.getItems().set(
                 index, selectedString.substring(0, selectedString.length() - 1));
         refreshSelectedTask();
+        savedSettingsMap.clear();
         savedSettingsMap.putAll(settingsMap);
     }
 
@@ -758,6 +761,42 @@ public class MainGUI {
         else if(recipientsTextField.getText().isEmpty()){
             showErrorAlert("Recipients field cannot be empty!");
             return false;
+        }
+        if(DEBUG){
+            if(oneTimeCheckBox.isSelected()){
+                boolean atDateEmpty = atDateTextField.getText().isEmpty();
+                boolean atTimeEmpty = atTimeTextField.getText().isEmpty();
+                if(atDateEmpty){
+                    showErrorAlert("Date field cannot be empty!");
+                    return false;
+                }
+                else if(atTimeEmpty){
+                    showErrorAlert("Time field cannot be empty!");
+                    return false;
+                }
+            }
+            else if(repeatCheckBox.isSelected()){
+                boolean fromDateEmpty = fromDateTextField.getText().isEmpty();
+                boolean fromTimeEmpty = fromTimeTextField.getText().isEmpty();
+                boolean freqMinEmpty = freqMinTextField.getText().isEmpty();
+                boolean freqHrsEmpty = freqHoursTextField.getText().isEmpty();
+                if(fromDateEmpty){
+                    showErrorAlert("Date field cannot be empty!");
+                    return false;
+                }
+                else if(fromTimeEmpty){
+                    showErrorAlert("Time field cannot be empty!");
+                    return false;
+                }
+                else if(freqMinEmpty){
+                    showErrorAlert("Minutes frequency field cannot be empty!");
+                    return false;
+                }
+                else if(freqHrsEmpty) {
+                    showErrorAlert("Hours frequency field cannot be empty!");
+                    return false;
+                }
+            }
         }
         if(contentTextField.getText().isEmpty()){
             if(!showConfirmationAlert("Content field is empty, would you" +

@@ -19,6 +19,10 @@ public class EmailActions {
         this.currTask = currTask;
     }
 
+    public void updateCurrTask(TaskSettings task){
+
+    }
+
     public boolean promptPassword(){
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Password");
@@ -60,17 +64,19 @@ public class EmailActions {
             public void run() {
                 int count = 0;
                 while(true){
-                    System.out.println("Thread debug");
+                    System.out.println("Thread debug " + count);
 
                     try{
                         Thread.sleep(1000);
                     } catch (InterruptedException e){
                         e.printStackTrace();
+                    } finally {
+                        count += 1;
                     }
+
                 }
             }
         });
         emailThread.start();
     }
-
 }
